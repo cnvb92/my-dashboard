@@ -508,10 +508,11 @@ const store = {
 /* ---------------- Links ---------------- */
 (function links(){
   const defaults = [
+    { name:"Year At A Glance", url:"https://docs.google.com/spreadsheets/d/1so3yt1FmdMlmsY98grshBjEjdx5vJorHFDWlpYQMYjE/edit?usp=sharing" },
     { name:"Gmail", url:"https://mail.google.com" },
     { name:"Google Classroom", url:"https://classroom.google.com" },
-    { name:"Clay County Portal", url:"https://www.focus.clayschools.org" },
-    { name:"Staff Phone List", url:"https://docs.google.com" }
+    { name:"Clay County Portal", url:"https://launchpad.classlink.com/oneclay" },
+    { name:"Staff Phone List", url:"https://docs.google.com/spreadsheets/d/1PcvtfDmCk11R-Ec5bcRMHltQMXgM2QJNi3FoRWAdfX4/edit?usp=sharing" }
   ];
   let links = store.get('desk-links', defaults);
   const list = document.getElementById('link-list');
