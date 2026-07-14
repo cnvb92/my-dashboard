@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Desk</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#F3EEE1;
+    --parchment-dark:#EAE2CF;
+    --card:#FBF8F1;
+    --ink:#2C2A22;
+    --ink-soft:#5B5847;
+    --sage:#5B6B4F;
+    --sage-dark:#3F4B36;
+    --sage-pale:#E4E9DC;
+    --rose:#B5716B;
+    --gold:#A9823F;
+    --line:#DDD3B8;
+    --shadow: rgba(43,46,38,.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(91,107,79,.05), transparent 40%),
+      radial-gradient(circle at 80% 60%, rgba(181,113,107,.05), transparent 45%);
+    color:var(--ink);
+    font-family:'Lora', serif;
+    min-height:100vh;
+  }
+  .page{max-width:1180px; margin:0 auto; padding:38px 28px 70px;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    text-align:center;
+    padding-bottom:26px;
+    margin-bottom:30px;
+    border-bottom:1px solid var(--line);
+  }
+  .masthead .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--sage-dark);
+    margin-bottom:6px;
+  }
+  .masthead h1{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    font-size:38px;
+    margin:0 0 14px;
+    color:var(--ink);
+  }
+  .epigraph{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:19px;
+    max-width:620px;
+    margin:0 auto;
+    line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .epigraph cite{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-style:normal;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-top:10px;
+  }
+
+  /* ---------- Bookmark shelf ---------- */
+  .shelf{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:34px;
+  }
+  .bookmark{
+    position:relative;
+    width:150px;
+    background:var(--sage);
+    color:#fff;
+    padding:16px 12px 26px;
+    text-align:center;
+    box-shadow:0 6px 14px var(--shadow);
+    clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);
+    transition:transform .15s ease;
+  }
+  .bookmark:nth-child(odd){transform:rotate(-1.4deg);}
+  .bookmark:nth-child(even){transform:rotate(1.2deg);}
+  .bookmark:hover{transform:rotate(0deg) translateY(-3px);}
+  .bookmark.gold{background:var(--gold);}
+  .bookmark .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    opacity:.85;
+  }
+  .bookmark .num{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    font-size:30px;
+    line-height:1.1;
+    margin:6px 0 2px;
+  }
+  .bookmark .sub{font-size:11px; opacity:.85;}
+  .bookmark .edit-date{
+    display:block;
+    margin-top:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    color:#fff;
+    background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.4);
+    border-radius:3px;
+    padding:2px 4px;
+    width:100%;
+  }
+
+  /* ---------- Grid ---------- */
+  .grid{display:grid; grid-template-columns:1.5fr 1fr; gap:22px;}
+  @media (max-width:880px){ .grid{grid-template-columns:1fr;} }
+  .col{display:flex; flex-direction:column; gap:22px;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    box-shadow:0 4px 12px var(--shadow);
+    padding:22px 24px;
+  }
+  .card h2{
+    font-family:'Playfair Display', serif;
+    font-size:19px;
+    font-weight:600;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .card .card-note{font-size:12px; color:var(--ink-soft); margin-bottom:16px;}
+
+  /* ---------- Schedule ---------- */
+  .day-toggle{display:flex; gap:8px; margin-bottom:14px;}
+  .day-toggle button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.05em;
+    background:var(--sage-pale);
+    border:1px solid var(--line);
+    color:var(--sage-dark);
+    padding:5px 10px;
+    cursor:pointer;
+  }
+  .day-toggle button.active{background:var(--sage); color:#fff; border-color:var(--sage);}
+  table.sched{width:100%; border-collapse:collapse;}
+  table.sched td{
+    padding:9px 6px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  table.sched td.per{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    width:60px;
+    color:var(--rose);
+  }
+  table.sched td.time{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    text-align:right;
+    color:var(--ink-soft);
+  }
+  table.sched tr.now td{
+    background:var(--sage-pale);
+    font-weight:600;
+    color:var(--sage-dark);
+  }
+
+  /* ---------- To-do ---------- */
+  .todo-list{list-style:none; margin:0; padding:0;}
+  .todo-list li{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .todo-list li.done span{text-decoration:line-through; color:var(--ink-soft);}
+  .todo-list li input[type=checkbox]{accent-color:var(--sage); width:16px; height:16px;}
+  .todo-list li .del{margin-left:auto; cursor:pointer; color:var(--rose); font-size:12px; font-family:'JetBrains Mono',monospace;}
+  .add-row{display:flex; gap:8px; margin-top:12px;}
+  .add-row input{
+    flex:1;
+    font-family:'Lora', serif;
+    font-size:14px;
+    padding:7px 9px;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+  .add-row button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    background:var(--sage);
+    color:#fff;
+    border:none;
+    padding:7px 14px;
+    cursor:pointer;
+  }
+
+  /* ---------- Weather ---------- */
+  .weather-main{display:flex; align-items:center; gap:16px; margin-bottom:10px;}
+  .weather-temp{font-family:'Playfair Display', serif; font-size:44px; font-weight:600;}
+  .weather-desc{font-size:14px; color:var(--ink-soft);}
+  .weather-range{font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sage-dark);}
+
+  /* ---------- Links ---------- */
+  .link-list{list-style:none; margin:0; padding:0;}
+  .link-list li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .link-list li a{color:var(--sage-dark); text-decoration:none; font-weight:500;}
+  .link-list li a:hover{text-decoration:underline;}
+  .link-list li .edit{cursor:pointer; font-size:11px; color:var(--rose); font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- Inbox notes ---------- */
+  textarea.inbox-notes{
+    width:100%;
+    min-height:110px;
+    font-family:'Lora', serif;
+    font-size:13.5px;
+    border:1px solid var(--line);
+    background:#fff;
+    padding:10px;
+    resize:vertical;
+  }
+  .gmail-btn{
+    display:inline-block;
+    margin-top:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    background:var(--rose);
+    color:#fff;
+    text-decoration:none;
+    padding:7px 14px;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:40px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    letter-spacing:.05em;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="masthead">
+    <div class="eyebrow" id="today-eyebrow">—</div>
+    <h1 id="greeting">Good morning, Ciara</h1>
+    <div class="epigraph" id="quote-text">Loading a line worth starting the day on…</div>
+  </div>
+
+  <div class="shelf" id="bookmark-shelf"></div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="card">
+        <h2>Today's Periods</h2>
+        <div class="card-note">M / T / Th / F run full length — Wednesdays run 4 minutes shorter per period.</div>
+        <div class="day-toggle" id="day-toggle">
+          <button data-day="regular">M · T · Th · F</button>
+          <button data-day="wed">Wednesday</button>
+        </div>
+        <table class="sched" id="sched-table"></table>
+      </div>
+
+      <div class="card">
+        <h2>To-Do — Back to School Prep</h2>
+        <div class="card-note">Checked items stay struck through until you clear them.</div>
+        <ul class="todo-list" id="todo-list"></ul>
+        <div class="add-row">
+          <input type="text" id="todo-input" placeholder="Add a task…">
+          <button id="todo-add">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2>Weather</h2>
+        <div class="card-note" id="weather-place">Jacksonville, FL</div>
+        <div id="weather-body">
+          <div class="weather-main">
+            <div class="weather-temp">--°</div>
+            <div>
+              <div class="weather-desc">Fetching forecast…</div>
+              <div class="weather-range"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Quick Links</h2>
+        <div class="card-note">Click the pencil to edit a link.</div>
+        <ul class="link-list" id="link-list"></ul>
+      </div>
+
+      <div class="card">
+        <h2>Priority Inbox Notes</h2>
+        <div class="card-note">Live Gmail can't be embedded here — jot what needs a reply, then jump straight in.</div>
+        <textarea class="inbox-notes" id="inbox-notes" placeholder="e.g. Reply to Dr. Alvarez re: grad school recommendation letter…"></textarea>
+        <a class="gmail-btn" href="https://mail.google.com" target="_blank">Open Gmail →</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>edited by you · saved in this browser</footer>
+</div>
+
+<script>
+/* ---------------- Storage helpers ---------------- */
+const store = {
+  get(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } },
+  set(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+};
+
+/* ---------------- Masthead ---------------- */
+(function masthead(){
+  const now = new Date();
+  const hour = now.getHours();
+  const greetingWord = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  document.getElementById('greeting').textContent = `${greetingWord}, Ciara`;
+  document.getElementById('today-eyebrow').textContent = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+  const quotes = [
+    ["It is a truth universally acknowledged, that a single man in possession of a good fortune must be in want of a good book.", "after Jane Austen"],
+    ["I am no bird; and no net ensnares me: I am a free human being with an independent will.", "Charlotte Brontë, Jane Eyre"],
+    ["Whatever our souls are made of, his and mine are the same.", "Emily Brontë, Wuthering Heights"],
+    ["We loved with a love that was more than love.", "Edgar Allan Poe, Annabel Lee"],
+    ["It was the best of times, it was the worst of times.", "Charles Dickens, A Tale of Two Cities"],
+    ["I have spread my dreams under your feet; tread softly because you tread on my dreams.", "W.B. Yeats"],
+    ["Tell all the truth but tell it slant.", "Emily Dickinson"],
+    ["We are all fools in love.", "Jane Austen, Pride and Prejudice"],
+    ["The past is never dead. It's not even past.", "William Faulkner"],
+    ["I took a deep breath and listened to the old brag of my heart: I am, I am, I am.", "Sylvia Plath, The Bell Jar"],
+    ["There is some good in this world, and it's worth fighting for.", "J.R.R. Tolkien"],
+    ["What is dangerous is not to change, but to lose sight of oneself.", "Mary Shelley, Frankenstein"],
+    ["I am ill at these numbers; I have not art to reckon my groans.", "William Shakespeare, Hamlet"],
+    ["And, when you want something, all the universe conspires in helping you to achieve it.", "Paraulo Coelho, The Alchemist"],
+    ["It does not do to dwell on dreams and forget to live.", "J.K. Rowling, Harry Potter"],
+    ["Not all those who wander are lost.", "J.R.R. Tolkien"],
+    ["I want to be all used up when I die.", "George Bernard Shaw"],
+    ["The house had a tongue of its own and a will of its own.", "after Shirley Jackson, The Haunting of Hill House"],
+    ["Every day I remind myself that my inner and outer life are dependent on the labors of others.", "Albert Einstein"],
+    ["It was a bright cold day in April, and the clocks were striking thirteen.", "George Orwell, 1984"]
+  ];
+  const dayIndex = Math.floor((now - new Date(now.getFullYear(),0,0)) / 86400000);
+  const [line, author] = quotes[dayIndex % quotes.length];
+  document.getElementById('quote-text').innerHTML = `“${line}”<cite>${author}</cite>`;
+})();
+
+/* ---------------- Countdown bookmarks ---------------- */
+(function bookmarks(){
+  const defaults = [
+    { label:"First Day", date:"2026-08-11" },
+    { label:"Quarter 1 Ends", date:"2026-10-09" },
+    { label:"Quarter 2 Ends", date:"2026-12-18" },
+    { label:"Quarter 3 Ends", date:"2027-03-12" },
+    { label:"Quarter 4 Ends", date:"2027-06-04" }
+  ];
+  let dates = store.get('desk-countdowns', defaults);
+  const shelf = document.getElementById('bookmark-shelf');
+
+  function render(){
+    shelf.innerHTML = '';
+    const today = new Date(); today.setHours(0,0,0,0);
+    dates.forEach((item, i) => {
+      const target = new Date(item.date + 'T00:00:00');
+      const diff = Math.round((target - today) / 86400000);
+      const div = document.createElement('div');
+      div.className = 'bookmark' + (i % 2 === 1 ? ' gold' : '');
+      const numText = diff > 0 ? diff : diff === 0 ? '0' : `${Math.abs(diff)}`;
+      const subText = diff > 0 ? 'days to go' : diff === 0 ? "it's today" : 'days ago';
+      div.innerHTML = `
+        <div class="label">${item.label}</div>
+        <div class="num">${numText}</div>
+        <div class="sub">${subText}</div>
+        <input type="date" class="edit-date" value="${item.date}">
+      `;
+      div.querySelector('.edit-date').addEventListener('change', e => {
+        dates[i].date = e.target.value;
+        store.set('desk-countdowns', dates);
+        render();
+      });
+      shelf.appendChild(div);
+    });
+  }
+  render();
+})();
+
+/* ---------------- Schedule ---------------- */
+(function schedule(){
+  const regular = [
+    ["1st","7:20 AM","8:10 AM"],
+    ["2nd","8:15 AM","9:05 AM"],
+    ["3rd","9:10 AM","10:00 AM"],
+    ["4th","10:05 AM","10:55 AM"],
+    ["5th","11:00 AM","12:45 PM"],
+    ["6th","12:50 PM","1:40 PM"]
+  ];
+  const wed = [
+    ["1st","7:20 AM","8:06 AM"],
+    ["2nd","8:15 AM","9:01 AM"],
+    ["3rd","9:10 AM","9:56 AM"],
+    ["4th","10:05 AM","10:51 AM"],
+    ["5th","11:00 AM","12:41 PM"],
+    ["6th","12:50 PM","1:36 PM"]
+  ];
+  const table = document.getElementById('sched-table');
+  const toggle = document.getElementById('day-toggle');
+  const isWed = new Date().getDay() === 3;
+
+  function toMinutes(t){
+    const [time, ap] = t.split(' ');
+    let [h,m] = time.split(':').map(Number);
+    if(ap === 'PM' && h !== 12) h += 12;
+    if(ap === 'AM' && h === 12) h = 0;
+    return h*60+m;
+  }
+
+  function render(which){
+    const data = which === 'wed' ? wed : regular;
+    const nowMin = new Date().getHours()*60 + new Date().getMinutes();
+    table.innerHTML = data.map(([per,start,end]) => {
+      const active = nowMin >= toMinutes(start) && nowMin <= toMinutes(end);
+      return `<tr class="${active ? 'now' : ''}">
+        <td class="per">${per}</td>
+        <td class="time">${start} – ${end}</td>
+      </tr>`;
+    }).join('');
+    [...toggle.children].forEach(b => b.classList.toggle('active', b.dataset.day === which));
+  }
+
+  toggle.addEventListener('click', e => {
+    if(e.target.tagName === 'BUTTON') render(e.target.dataset.day);
+  });
+  render(isWed ? 'wed' : 'regular');
+})();
+
+/* ---------------- To-do ---------------- */
+(function todo(){
+  const defaults = [
+    { text:"Set up classroom & seating chart", done:false },
+    { text:"Print syllabi for all sections", done:false },
+    { text:"Update gradebook for new year", done:false },
+    { text:"Prep first week's lesson plans", done:false },
+    { text:"Review BEST standards pacing guide", done:false },
+    { text:"Test classroom AV / tech", done:false },
+    { text:"Organize supply closet", done:false }
+  ];
+  let todos = store.get('desk-todos', defaults);
+  const list = document.getElementById('todo-list');
+  const input = document.getElementById('todo-input');
+
+  function render(){
+    list.innerHTML = '';
+    todos.forEach((t,i) => {
+      const li = document.createElement('li');
+      if(t.done) li.classList.add('done');
+      li.innerHTML = `<input type="checkbox" ${t.done ? 'checked' : ''}><span>${t.text}</span><span class="del">remove</span>`;
+      li.querySelector('input').addEventListener('change', () => { todos[i].done = !todos[i].done; store.set('desk-todos', todos); render(); });
+      li.querySelector('.del').addEventListener('click', () => { todos.splice(i,1); store.set('desk-todos', todos); render(); });
+      list.appendChild(li);
+    });
+  }
+  document.getElementById('todo-add').addEventListener('click', () => {
+    const val = input.value.trim();
+    if(!val) return;
+    todos.push({ text:val, done:false });
+    store.set('desk-todos', todos);
+    input.value = '';
+    render();
+  });
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('todo-add').click(); });
+  render();
+})();
+
+/* ---------------- Links ---------------- */
+(function links(){
+  const defaults = [
+    { name:"Gmail", url:"https://mail.google.com" },
+    { name:"Google Classroom", url:"https://classroom.google.com" },
+    { name:"Clay County Portal", url:"https://www.focus.clayschools.org" },
+    { name:"Staff Phone List", url:"https://docs.google.com" }
+  ];
+  let links = store.get('desk-links', defaults);
+  const list = document.getElementById('link-list');
+
+  function render(){
+    list.innerHTML = '';
+    links.forEach((l,i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="${l.url}" target="_blank">${l.name}</a><span class="edit">✎ edit</span>`;
+      li.querySelector('.edit').addEventListener('click', () => {
+        const newName = prompt('Link name:', l.name);
+        if(newName === null) return;
+        const newUrl = prompt('URL:', l.url);
+        if(newUrl === null) return;
+        links[i] = { name:newName, url:newUrl };
+        store.set('desk-links', links);
+        render();
+      });
+      list.appendChild(li);
+    });
+  }
+  render();
+})();
+
+/* ---------------- Inbox notes ---------------- */
+(function inbox(){
+  const area = document.getElementById('inbox-notes');
+  area.value = store.get('desk-inbox-notes', '');
+  area.addEventListener('input', () => store.set('desk-inbox-notes', area.value));
+})();
+
+/* ---------------- Weather (Open-Meteo, no key needed) ---------------- */
+(function weather(){
+  const lat = 30.3322, lon = -81.6557; // Jacksonville, FL
+  const codeMap = {
+    0:"Clear sky", 1:"Mostly clear", 2:"Partly cloudy", 3:"Overcast",
+    45:"Fog", 48:"Fog", 51:"Light drizzle", 53:"Drizzle", 55:"Heavy drizzle",
+    61:"Light rain", 63:"Rain", 65:"Heavy rain", 71:"Light snow", 73:"Snow", 75:"Heavy snow",
+    80:"Rain showers", 81:"Rain showers", 82:"Violent showers",
+    95:"Thunderstorm", 96:"Thunderstorm w/ hail", 99:"Severe thunderstorm"
+  };
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York`)
+    .then(r => r.json())
+    .then(data => {
+      const temp = Math.round(data.current.temperature_2m);
+      const desc = codeMap[data.current.weather_code] || "—";
+      const hi = Math.round(data.daily.temperature_2m_max[0]);
+      const lo = Math.round(data.daily.temperature_2m_min[0]);
+      document.getElementById('weather-body').innerHTML = `
+        <div class="weather-main">
+          <div class="weather-temp">${temp}°</div>
+          <div>
+            <div class="weather-desc">${desc}</div>
+            <div class="weather-range">H: ${hi}° · L: ${lo}°</div>
+          </div>
+        </div>`;
+    })
+    .catch(() => {
+      document.getElementById('weather-body').innerHTML = `<div class="weather-desc">Couldn't load forecast — check your connection.</div>`;
+    });
+})();
+</script>
+</body>
+</html>
