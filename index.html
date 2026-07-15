@@ -260,6 +260,15 @@
     padding:7px 14px;
   }
 
+  #pinterest-embed-wrap{
+    max-height:340px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    border:1px solid var(--line);
+    padding:6px;
+    background:#fff;
+  }
+
   footer{
     text-align:center;
     margin-top:40px;
@@ -319,6 +328,14 @@
         </div>
       </div>
 
+      <div class="card" id="pinterest-card">
+        <h2>Pinterest Board</h2>
+        <div class="card-note">Something Cute To Make Me Smile...</div>
+        <div id="pinterest-embed-wrap">
+          <a data-pin-do="embedBoard" data-pin-scale-height="120" data-pin-scale-width="80" href="https://www.pinterest.com/bravxryyy/widgets/"></a>
+        </div>
+      </div>
+
       <div class="card">
         <h2>Quick Links</h2>
         <div class="card-note">Click the pencil to edit a link.</div>
@@ -326,9 +343,9 @@
       </div>
 
       <div class="card">
-        <h2>Priority Inbox Notes</h2>
-        <div class="card-note">Live Gmail can't be embedded here — jot what needs a reply, then jump straight in.</div>
-        <textarea class="inbox-notes" id="inbox-notes" placeholder="e.g. Reply to Dr. Alvarez re: grad school recommendation letter…"></textarea>
+        <h2>Priority Notes</h2>
+        <div class="card-note">Take Note of Things To Remember</div>
+        <textarea class="inbox-notes" id="inbox-notes" placeholder="e.g. Mrs.Viner-Boots is the best English Teacher Ever…"></textarea>
         <a class="gmail-btn" href="https://mail.google.com" target="_blank">Open Gmail →</a>
       </div>
     </div>
@@ -508,11 +525,12 @@ const store = {
 /* ---------------- Links ---------------- */
 (function links(){
   const defaults = [
-    { name:"Year At A Glance", url:"https://canva.link/cnvbyag2627" },
+    { name:"Google", url:"https://google.com" },
+    { name:"Year At A Glance", url:"https://www.canva.com/design/DAHPdS6s_CQ/OaKQ8DfGVZxHuxOrRrX-gg/edit?utm_content=DAHPdS6s_CQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton" },
     { name:"Gmail", url:"https://mail.google.com" },
     { name:"Google Classroom", url:"https://classroom.google.com" },
     { name:"Clay County Portal", url:"https://launchpad.classlink.com/oneclay" },
-    { name:"Staff Phone List", url:"https://docs.google.com/spreadsheets/d/1PcvtfDmCk11R-Ec5bcRMHltQMXgM2QJNi3FoRWAdfX4/edit?usp=sharing" }
+    { name:"Staff Phone List", url:"https://docs.google.com/spreadsheets/d/1PcvtfDmCk11R-Ec5bcRMHltQMXgM2QJNi3FoRWAdfX4/edit?gid=0#gid=0" }
   ];
   let links = store.get('desk-links', defaults);
   const list = document.getElementById('link-list');
@@ -575,5 +593,7 @@ const store = {
     });
 })();
 </script>
+
+<script async defer src="//assets.pinterest.com/js/pinit.js"></script>
 </body>
 </html>
